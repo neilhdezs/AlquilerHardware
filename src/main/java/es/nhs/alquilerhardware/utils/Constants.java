@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
  * @since 25/01/2023
  */
 @Service
-public final class Constants
+public interface Constants
 {
 
     public static final String SESSION_RESERVA_AULA = "reservaAula";

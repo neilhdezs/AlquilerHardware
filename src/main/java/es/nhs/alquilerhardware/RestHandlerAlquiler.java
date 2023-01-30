@@ -4,10 +4,10 @@ package es.nhs.alquilerhardware;
 import es.nhs.alquilerhardware.models.*;
 import es.nhs.alquilerhardware.models.modelsRest.Reservas;
 import es.nhs.alquilerhardware.repository.*;
-import es.nhs.alquilerhardware.utils.Constants;
-import es.nhs.alquilerhardware.utils.JsonUtils;
-import es.nhs.alquilerhardware.utils.ReservaException;
+import es.nhs.alquilerhardware.utils.*;
 import jakarta.servlet.http.HttpSession;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,6 +30,13 @@ import java.util.List;
 public class RestHandlerAlquiler
 {
 
+
+    //TODO: CAMBIAR LAS EXCEPCIONES CON LOGGER Y MOSTRAR POR CONSOLA
+
+
+
+    private final Logger LOGGER = LogManager.getLogger(RestHandlerAlquiler.class);
+
     @Autowired
     private IAulaInformaticaRepository aulaInformaticaRepository;
 
@@ -51,6 +58,10 @@ public class RestHandlerAlquiler
     @Autowired
     private IReservaCarritoPcsRepository reservaCarritoPcsRepository;
 
+    @Autowired
+    private CheckerSession checkerSession;
+
+
     /**
      * Metodo en el que se obtiene la lista de reservas
      */
@@ -62,32 +73,18 @@ public class RestHandlerAlquiler
 
         try
         {
+            // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
+            session.setAttribute(Constants.SESSION_RESERVA_AULA, checkerSession.checkSessionReservaAula((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA)));
 
-            if (session.getAttribute(Constants.SESSION_RESERVA_AULA) == null)
-            {
-                session.setAttribute(Constants.SESSION_RESERVA_AULA, new ArrayList<>());  // Se Inicializa la reserva de Aulas de la sesion
-            }
+            // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
+            session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, checkerSession.checkSessionReservaCarritoTablets((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)));
 
-            if (session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS) == null)
-            {
-                session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, new ArrayList<>());  // Se Inicializa la reserva del carrito de tablets de la sesion
-            }
+            // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
+            session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, checkerSession.checkSessionReservaCarritoPcs((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)));
 
-            if (session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS) == null)
-            {
-                session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, new ArrayList<>());  // Se Inicializa la reserva del carrito de pcs la sesion
-            }
-
-            List<ReservaAula> listaReservasAulas = new ArrayList<>();
-            List<ReservaCarritoTablets> listaReservasTablets = new ArrayList<>();
-            List<ReservaCarritoPcs> listaReservasPcs = new ArrayList<>();
-
-            // RELLENAR LAS LISTAS CON LOS DATOS DE LA BASE DE DATOS
-
-            listaReservasAulas = reservaAulaRespository.findAll();
-            listaReservasTablets = reservaCarritoTabletsRepository.findAll();
-            listaReservasPcs = reservaCarritoPcsRepository.findAll();
-
+            List<ReservaAula> listaReservasAulas = this.reservaAulaRespository.findAll();;
+            List<ReservaCarritoTablets> listaReservasTablets = this.reservaCarritoTabletsRepository.findAll();
+            List<ReservaCarritoPcs> listaReservasPcs = this.reservaCarritoPcsRepository.findAll();
 
             return ResponseEntity.ok(new Reservas(listaReservasAulas, listaReservasTablets, listaReservasPcs));
         }
@@ -107,10 +104,8 @@ public class RestHandlerAlquiler
     {
         try
         {
-            if (session.getAttribute(Constants.SESSION_RESERVA_AULA) == null)
-            {
-                session.setAttribute(Constants.SESSION_RESERVA_AULA, new ArrayList<>());  // Se Inicializa la reserva de Aulas de la sesion
-            }
+            // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
+            session.setAttribute(Constants.SESSION_RESERVA_AULA, checkerSession.checkSessionReservaAula((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA)));
 
             List<ReservaAula> listaReservasAulas = new ArrayList<>();
 
@@ -137,10 +132,8 @@ public class RestHandlerAlquiler
     {
         try
         {
-            if (session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS) == null)
-            {
-                session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, new ArrayList<>());  // Se Inicializa la reserva del carrito de tablets de la sesion
-            }
+            // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
+            session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, checkerSession.checkSessionReservaCarritoTablets((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)));
 
             List<ReservaCarritoTablets> listaReservasTablets = new ArrayList<>();
 
@@ -167,10 +160,8 @@ public class RestHandlerAlquiler
     {
         try
         {
-            if (session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS) == null)
-            {
-                session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, new ArrayList<>());  // Se Inicializa la reserva del carrito de pcs la sesion
-            }
+            // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
+            session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, checkerSession.checkSessionReservaCarritoPcs((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)));
 
             List<ReservaCarritoPcs> listaReservasPcs = new ArrayList<>();
 
@@ -199,6 +190,8 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long fecha
     )
     {
+        // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
+        session.setAttribute(Constants.SESSION_RESERVA_AULA, checkerSession.checkSessionReservaAula((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA)));
 
         ReservaAula reservaAula = this.reservaAulaRespository.findById(new ReservaAulaId(idAula, new Date(fecha))).orElse(null);
 
@@ -209,45 +202,36 @@ public class RestHandlerAlquiler
 
         try
         {
+            Profesor profesor = this.profesorRepository.findById(idProfesor).orElse(null);
 
-            Profesor profesor;
-
-            AulaInformatica aulaInformatica;
-
-            profesor = this.profesorRepository.findById(idProfesor).orElse(null);
-
-            aulaInformatica = this.aulaInformaticaRepository.findById(idAula).orElse(null);
+            AulaInformatica aulaInformatica = this.aulaInformaticaRepository.findById(idAula).orElse(null);
 
             if (profesor != null && aulaInformatica != null)
             {
-
                 reservaAula = new ReservaAula(new ReservaAulaId(idAula, new Date(fecha)), profesor, aulaInformatica);
 
                 ((List<ReservaAula>)session.getAttribute(Constants.SESSION_RESERVA_AULA)).add(reservaAula);
-
             }
             else
             {
                 return ResponseEntity.status(420).body("profesor o aula no encontrados");
             }
 
-
             return ResponseEntity.ok(reservaAula);
-
         }
         catch (Exception exception)
         {
-            return ResponseEntity.status(590).body(exception.getMessage());
+            LOGGER.error("Error al reservar el aula", exception);
+            exception.printStackTrace();
+            return ResponseEntity.status(590).body("Error al reservar el aula");
         }
-
     }
-
 
     /**
      * Metodo en el que se genera una reserva de un carrito de tablets
      */
     @RequestMapping(method = RequestMethod.POST, value = "/tablets/")
-    public ResponseEntity<?> postReservartablets(
+    public ResponseEntity<?> postReservarTablets(
                                                         HttpSession session,
                                                         @RequestParam(required=true) final Long idProfesor,
                                                         @RequestParam(required=true) final String aulaDestino,
@@ -255,6 +239,10 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long idCarritoTablets
     )
     {
+
+        // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
+        session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, checkerSession.checkSessionReservaCarritoTablets((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)));
+
 
         // VAMOS A VER SI HAY CARRITOS DISPONIBLES EN ESA FECHA
 
@@ -318,6 +306,9 @@ public class RestHandlerAlquiler
     )
     {
 
+        // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
+        session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, checkerSession.checkSessionReservaCarritoPcs((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)));
+
         ReservaCarritoPcs reservaCarritoPcs = this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha))).orElse(null);
 
         if (reservaCarritoPcs != null)
@@ -374,13 +365,13 @@ public class RestHandlerAlquiler
             List<ReservaCarritoTablets> reservaCarritoTablets = (List<ReservaCarritoTablets>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
             List<ReservaCarritoPcs> reservaCarritoPcs = (List<ReservaCarritoPcs>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
 
-            session.removeAttribute(Constants.SESSION_RESERVA_AULA);
-            session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
-            session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
-
             this.reservaAulaRespository.saveAllAndFlush(reservaAulaList);
             this.reservaCarritoTabletsRepository.saveAllAndFlush(reservaCarritoTablets);
             this.reservaCarritoPcsRepository.saveAllAndFlush(reservaCarritoPcs);
+
+            session.removeAttribute(Constants.SESSION_RESERVA_AULA);
+            session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
+            session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
 
             return ResponseEntity.ok().build();
         }
