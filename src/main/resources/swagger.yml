@@ -1,0 +1,273 @@
+swagger: '2.0'
+host: localhost:8080
+basePath: /reserva
+info:
+  version : 1.0.0
+  title: Reservas
+  description: Gestión de las reserva de las aulas de informática (2.11 y 2.13) y el préstamo de los carritos de la primera y segunda planta para los docentes.
+
+  contact:
+    name: Neil Hernández Salvador
+    email: hernandezsalvadorneil@gmail.com
+    url: https://www.neilhdez.com
+
+schemes:
+  - http
+  - https
+
+produces:  #Para que todos respondan con lo mismo
+  - application/json
+
+paths:
+
+  /:
+    get:
+      operationId: getReservas
+      description: Metodo que retorna todas las reservas de aulas y carros de todas las semanas hasta final de curso
+      produces:
+        - application/json
+      responses:
+        200:
+          description: Objeto de Tipo Reservas en el que se listan todas las reservas de aulas y carros de todas las semanas hasta final de curso
+          schema:
+            $ref: "#/definitions/ListadoReservas"
+
+        503:
+          description: Error al descargar los datos de la base de datos
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /aula/:
+    post:
+      operationId: postReservarAula
+      description: Metodo en el que un profesor realiza una reserva de una aula en una fecha y lo guarda en la sesion
+      parameters:
+        - name: idAutorReserva
+          description: se indica el id de la persona que ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: fechaReserva
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: idAula
+          description: se indica el id del aula que se quiere reservar
+          in: query
+          type: integer
+          format: int64
+          required: true
+
+      responses:
+        200:
+          description: Todo ha ido bien y se ha almacenado en la sesión correctamente la reserva
+
+        422:
+          description: Error al pasar los parametros
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /tablets/:
+    post:
+      operationId: postReservarTablets
+      description: Metodo en el que un profesor realiza una reserva de un carrito de tablets en una fecha y lo guarda en la sesion
+      parameters:
+        - name: idProfesor
+          description: se indica el id de la persona que ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: aulaDestino
+          description: se indica el id del aula en el que estará el carrito
+          in: query
+          type: string
+          format: int64
+          required: true
+        - name: fecha
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: idCarritoTablets
+          description: se indica el id del carrito de tablets que se quiere reservar
+          in: query
+          type: integer
+          format: int64
+          required: true
+
+
+      responses:
+        200:
+          description: Todo ha ido bien y se ha almacenado en la sesión correctamente la reserva
+
+        420:
+          description: Error al Profesor, aula o carrito inexistente
+          schema:
+              $ref: "#/definitions/ReservaException"
+
+        422:
+          description: Error al pasar los parametros
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /ordenadores/:
+    post:
+      operationId: postReservarOrdenadores
+      description: Metodo en el que un profesor realiza una reserva de un carrito de ordenadores en una fecha y lo guarda en la sesion
+      parameters:
+        - name: idProfesor
+          description: se indica el id de la persona que ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: fechaReserva
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: idCarritoOrdenadores
+          description: se indica el id del carrito de ordenadores que se quiere reservar
+          in: query
+          type: integer
+          required: true
+        - name: aulaDestino
+          description: se indica el aula en el que estará el carrito
+          in: query
+          type: string
+          required: true
+
+      responses:
+        200:
+          description: Todo ha ido bien y se ha almacenado en la sesión correctamente la reserva
+
+        422:
+          description: Error al pasar los parametros
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /confirmar/:
+    post:
+      operationId: postConfirmarReserva
+      description: obtenemos los datos de las reservas en la sesión y las almacenamos en el servidor
+      responses:
+        200:
+          description: Todo ha ido bien y he cogido los datos que hay en la sesión y los he almacenado
+
+        503:
+          description: Error al cargar los datos en la base de datos
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+
+
+
+definitions:
+
+  ListadoReservas:
+    type: object
+    properties:
+
+      listaReservasAulas:
+        description: Lisa en la que se encuentran todas las reservas de Aulas hasta final de curso
+        type: array
+        items:
+          $ref: "#/definitions/ReservaAula"
+
+      listaReservasTablets:
+        description: Lisa en la que se encuentran todas las reservas de carros de tablets hasta final de curso
+        type: array
+        items:
+          $ref: "#/definitions/ReservaPcs"
+
+      listaReservasOrdenadores:
+        description: Lisa en la que se encuentran todas las reservas de carros de ordenadores hasta final de curso
+        type: array
+        items:
+          $ref: "#/definitions/ReservaTablets"
+
+  ReservaAula:
+    type: object
+    properties:
+
+      idAutor:
+        description: id del autor de la reserva
+        type: integer
+        format: int64
+
+      fechaReserva:
+        description: fecha en la que se ha realizado la fecha en formato long
+        type: integer
+        format: int64
+
+      idAula:
+        description: id del aula que se ha reservado
+        type: integer
+        format: int64
+
+  ReservaPcs:
+    type: object
+    properties:
+
+      idAutor:
+        description: id del autor de la reserva
+        type: integer
+        format: int64
+
+      fechaReserva:
+        description: fecha en la que se ha realizado la fecha en formato long
+        type: integer
+        format: int64
+
+      idCarro:
+        description: id del carro que se ha reservado
+        type: integer
+        format: int64
+
+      idAula:
+        description: id del aula que se ha reservado
+        type: integer
+        format: int64
+
+  ReservaTablets:
+    type: object
+    properties:
+
+      idAutor:
+        description: id del autor de la reserva
+        type: integer
+        format: int64
+
+      fechaReserva:
+        description: fecha en la que se ha realizado la fecha en formato long
+        type: integer
+        format: int64
+
+      idCarro:
+        description: id del carro que se ha reservado
+        type: integer
+        format: int64
+
+      idAula:
+        description: id del aula que se ha reservado
+        type: integer
+        format: int64
+
+
+  ReservaException:
+    description: En este caso solo tenemos el atributo code, ya que la información Mensaje y Excepción no es necesario almacenarla, ya que se le pasan directamente a los constructores y tenemos acceso desde la misma clase al construir la excepción
+    type: object
+    properties:
+
+      code:
+        description: Codigo de error personalizado que se muestra al cliente
+        type: string
+
+
+
