@@ -16,16 +16,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebHandlerAlquiler {
 
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/index.html", method = RequestMethod.GET)
     public String showIndex()
     {
         return "index.html";
     }
 
     @RequestMapping(value = "/aulas/", method = RequestMethod.GET)
-    public String showReservaAulas(Model model)
+    public String showReservaAulas()
     {
-        model.addAttribute("$datePicker", "<p>DatePicker</p>");
         return "/reservaAula.html";
     }
 
@@ -39,6 +38,12 @@ public class WebHandlerAlquiler {
     public String showReservaPcs()
     {
         return "/reservaPcs.html";
+    }
+
+    @RequestMapping(value = "/eliminarReserva/", method = RequestMethod.GET)
+    public String showEliminarReserva()
+    {
+        return "/removeReserva.html";
     }
 
     @RequestMapping(value = "/css/tables.css" , method = RequestMethod.GET)
@@ -81,6 +86,37 @@ public class WebHandlerAlquiler {
     public String showJsDataPicker()
     {
         return "/js/utils/dataPicker.js";
+    }
+
+    @RequestMapping(value = "/js/post_reservas/postReservaAula.js" , method = RequestMethod.GET)
+    public String showJsPostReservasAulas()
+    {
+        return "/js/post_reservas/postReservaAula.js";
+    }
+
+    @RequestMapping(value = "/js/query/post.js" , method = RequestMethod.GET)
+    public String showJsPost()
+    {
+        return "/js/query/post.js";
+    }
+
+    @RequestMapping(value = "/js/post_reservas/postReservaPcs.js" , method = RequestMethod.GET)
+    public String showJsPostReservasPcs()
+    {
+        return "/js/post_reservas/postReservaPcs.js";
+    }
+
+    @RequestMapping(value = "/js/utils/confirmAll.js" , method = RequestMethod.GET)
+    public String showJsConfirm()
+    {
+        return "/js/utils/confirmAll.js";
+    }
+
+
+    @RequestMapping(value = "js/post_reservas/postReservaTablets.js" , method = RequestMethod.GET)
+    public String showJsPostReservasTablets()
+    {
+        return "js/post_reservas/postReservaTablets.js";
     }
 
 }

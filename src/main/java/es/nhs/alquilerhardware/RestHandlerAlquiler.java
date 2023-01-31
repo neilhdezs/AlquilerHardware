@@ -30,10 +30,7 @@ import java.util.List;
 public class RestHandlerAlquiler
 {
 
-
     //TODO: CAMBIAR LAS EXCEPCIONES CON LOGGER Y MOSTRAR POR CONSOLA
-
-
 
     private final Logger LOGGER = LogManager.getLogger(RestHandlerAlquiler.class);
 
@@ -197,6 +194,7 @@ public class RestHandlerAlquiler
 
         if (reservaAula != null)
         {
+            LOGGER.error("Error al reservar el aula, ya existe una reserva para ese aula en esa fecha");
             return ResponseEntity.status(420).body("Ya existe una reserva para ese aula en esa fecha");
         }
 
@@ -214,6 +212,7 @@ public class RestHandlerAlquiler
             }
             else
             {
+                LOGGER.error("Error al reservar el aula, profesor o aula no encontrados");
                 return ResponseEntity.status(420).body("profesor o aula no encontrados");
             }
 
@@ -236,7 +235,7 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long idProfesor,
                                                         @RequestParam(required=true) final String aulaDestino,
                                                         @RequestParam(required=true) final Long fecha,
-                                                        @RequestParam(required=true) final Long idCarritoTablets
+                                                        @RequestParam(required=true) final Long idCarritoTablet
     )
     {
 
@@ -246,7 +245,7 @@ public class RestHandlerAlquiler
 
         // VAMOS A VER SI HAY CARRITOS DISPONIBLES EN ESA FECHA
 
-        ReservaCarritoTablets reservaCarritoTablets = this.reservaCarritoTabletsRepository.findById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha))).orElse(null);
+        ReservaCarritoTablets reservaCarritoTablets = this.reservaCarritoTabletsRepository.findById(new ReservaCarritoTabletsId(idCarritoTablet, new Date(fecha))).orElse(null);
 
         if (reservaCarritoTablets != null)
         {
@@ -259,17 +258,15 @@ public class RestHandlerAlquiler
         {
             Profesor profesor;
 
-            String aulaInformatica;
-
             CarritoTablets carritoTablets;
 
             profesor = this.profesorRepository.findById(idProfesor).orElse(null);
 
-            carritoTablets = this.carritoTabletsRepository.findById(idCarritoTablets).orElse(null);
+            carritoTablets = this.carritoTabletsRepository.findById(idCarritoTablet).orElse(null);
 
             if (profesor != null && carritoTablets != null)
             {
-                reservaCarritoTablets = new ReservaCarritoTablets(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha)), profesor, carritoTablets, aulaDestino);
+                reservaCarritoTablets = new ReservaCarritoTablets(new ReservaCarritoTabletsId(idCarritoTablet, new Date(fecha)), profesor, carritoTablets, aulaDestino);
 
                 ((List<ReservaCarritoTablets>)session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)).add(reservaCarritoTablets);
             }
@@ -302,14 +299,14 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long idProfesor,
                                                         @RequestParam(required=true) final String aulaDestino,
                                                         @RequestParam(required=true) final Long fecha,
-                                                        @RequestParam(required=true) final Long idCarritoPcs
+                                                        @RequestParam(required=true) final Long idCarritoPc
     )
     {
 
         // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, checkerSession.checkSessionReservaCarritoPcs((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)));
 
-        ReservaCarritoPcs reservaCarritoPcs = this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha))).orElse(null);
+        ReservaCarritoPcs reservaCarritoPcs = this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPc, new Date(fecha))).orElse(null);
 
         if (reservaCarritoPcs != null)
         {
@@ -324,12 +321,12 @@ public class RestHandlerAlquiler
 
             profesor = this.profesorRepository.findById(idProfesor).orElse(null);
 
-            carritoPcs = this.carritoPcsRespository.findById(idCarritoPcs).orElse(null);
+            carritoPcs = this.carritoPcsRespository.findById(idCarritoPc).orElse(null);
 
             if (profesor != null && carritoPcs != null)
             {
 
-                reservaCarritoPcs = new ReservaCarritoPcs(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha)), profesor, carritoPcs, aulaDestino);
+                reservaCarritoPcs = new ReservaCarritoPcs(new ReservaCarritoPcsId(idCarritoPc, new Date(fecha)), profesor, carritoPcs, aulaDestino);
 
                 ((List<ReservaCarritoPcs>)session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)).add(reservaCarritoPcs);
 
@@ -365,9 +362,21 @@ public class RestHandlerAlquiler
             List<ReservaCarritoTablets> reservaCarritoTablets = (List<ReservaCarritoTablets>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
             List<ReservaCarritoPcs> reservaCarritoPcs = (List<ReservaCarritoPcs>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
 
-            this.reservaAulaRespository.saveAllAndFlush(reservaAulaList);
-            this.reservaCarritoTabletsRepository.saveAllAndFlush(reservaCarritoTablets);
-            this.reservaCarritoPcsRepository.saveAllAndFlush(reservaCarritoPcs);
+            if (reservaAulaList != null)
+            {
+                this.reservaAulaRespository.saveAllAndFlush(reservaAulaList);
+            }
+
+            if (reservaCarritoTablets != null)
+            {
+                this.reservaCarritoTabletsRepository.saveAllAndFlush(reservaCarritoTablets);
+            }
+
+            if (reservaCarritoPcs != null)
+            {
+                this.reservaCarritoPcsRepository.saveAllAndFlush(reservaCarritoPcs);
+            }
+
 
             session.removeAttribute(Constants.SESSION_RESERVA_AULA);
             session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);

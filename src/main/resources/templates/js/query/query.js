@@ -1,22 +1,22 @@
-const URL = "http://localhost:8080"
+import {URL} from "../utils/utils.js";
 
 const getAllReservas = async () => {
-    const respone = await fetch(`${URL}/reservas/`)
+    const respone = await fetch(`${URL}reservas/`)
     return respone.json()
 }
 
 const getAllReservasAulas = async () => {
-    const respone = await fetch(`${URL}/reservas/aulas/`)
+    const respone = await fetch(`${URL}reservas/aulas/`)
     return respone.json()
 }
 
 const getAllReservasTablets = async () => {
-    const respone = await fetch(`${URL}/reservas/tablets/`)
+    const respone = await fetch(`${URL}reservas/tablets/`)
     return respone.json()
 }
 
 const getAllReservasPcs = async () => {
-    const respone = await fetch(`${URL}/reservas/pcs/`)
+    const respone = await fetch(`${URL}reservas/pcs/`)
     return respone.json()
 }
 

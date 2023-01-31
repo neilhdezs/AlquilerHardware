@@ -9,27 +9,61 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   <link rel="stylesheet" th:href="@{/css/tables.css}">
 </head>
-<body>
+  <body>
 
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" th:href="@{/}">Reservas</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/aulas/}">Reservar Aula <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" th:href="@{/tablets/}">Reservas Tablets</a>
-        </li>
-        <li class="nav-item active">
-          <a class="nav-link" th:href="@{/pcs/}">Reservar Pcs</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" th:href="@{/}">Reservas</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/aulas/}">Reservar Aula <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/tablets/}">Reservas Tablets</a>
+          </li>
+          <li class="nav-item active">
+            <a class="nav-link" th:href="@{/pcs/}">Reservar Pcs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" th:href="@{/eliminarReserva/}">Borrar Reserva</a>
+          </li>
+        </ul>
+        <input type="button" value="Confirmar" name="confirmarReserva" id="submitConfirmacion"/>
+      </div>
+    </nav>
 
-</body>
+
+    <h1>Reserva de Pcs</h1>
+    <label for="timePicker">Seleccione una hora:</label>
+    <select id="timePicker"></select>
+    <br>
+
+    <label for="datePicker">Seleccione una Fecha: </label>
+    <input type="date" id="datePicker" name="datePicker">
+    <br>
+
+
+    <label for="idProfesor">Indique su ID de Profesor: </label>
+    <input type="number" id="idProfesor" name="idProfesor">
+    <br>
+
+    <label for="aulaDestino">Indique el Aula de Destino: </label>
+    <input type="text" id="aulaDestino" name="aulaDestino">
+    <br>
+
+    <label for="idCarritoPc">Indique el ID del carrito de Pcs: </label>
+    <input type="number" id="idCarritoPc" name="idCarritoPc">
+    <br>
+
+    <input type="button" value="Guardar Reserva" id="submitReservaPcs">
+
+    <script type="module" th:src="@{/js/utils/dataPicker.js}"></script>
+    <script type="module" th:src="@{/js/post_reservas/postReservaPcs.js}"></script>
+    <script type="module" th:src="@{/js/utils/confirmAll.js}"></script>
+
+
+  </body>
 </html>

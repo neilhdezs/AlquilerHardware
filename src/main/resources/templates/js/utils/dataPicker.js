@@ -1,6 +1,6 @@
 let timePicker = document.getElementById("timePicker");
 
-let horasDisponibles = ["08:15", "09:15", "10:15", "11:15", "11:45", "12:45", "13:45", "14:45"];
+let horasDisponibles = ["08:15", "09:15", "10:15", "11:15", "11:45", "12:45", "13:45"];
 
 let opciones = "";
 horasDisponibles.forEach(function(hora) {
