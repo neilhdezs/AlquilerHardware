@@ -28,4 +28,11 @@ const postConfirmarReserva = async () => {
     return respone.status
 }
 
-export {postReservaAula, postConfirmarReserva, postReservaPcs, postReservaTablets}
+const postCancelarReserva = async (url) => {
+    const respone = await fetch(url, {
+        method: 'DELETE',
+    })
+    return respone.status
+}
+
+export {postReservaAula, postConfirmarReserva, postReservaPcs, postReservaTablets, postCancelarReserva}

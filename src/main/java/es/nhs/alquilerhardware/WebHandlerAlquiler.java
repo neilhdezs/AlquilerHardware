@@ -112,11 +112,22 @@ public class WebHandlerAlquiler {
         return "/js/utils/confirmAll.js";
     }
 
-
-    @RequestMapping(value = "js/post_reservas/postReservaTablets.js" , method = RequestMethod.GET)
+    @RequestMapping(value = "/js/post_reservas/postReservaTablets.js" , method = RequestMethod.GET)
     public String showJsPostReservasTablets()
     {
         return "js/post_reservas/postReservaTablets.js";
+    }
+
+    @RequestMapping(value = "/js/utils/changeIdForRemoveReservas.js" , method = RequestMethod.GET)
+    public String showJsChangeIdForRemoveReservas()
+    {
+        return "/js/utils/changeIdForRemoveReservas.js";
+    }
+
+    @RequestMapping(value = "/js/post_reservas/postDeleteReserva.js" , method = RequestMethod.GET)
+    public String showJsPostDeleteReserva()
+    {
+        return "/js/post_reservas/postDeleteReserva.js";
     }
 
 }

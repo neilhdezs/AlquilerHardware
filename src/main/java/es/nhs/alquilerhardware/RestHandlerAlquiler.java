@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -24,7 +25,7 @@ import java.util.List;
  * @since 15/01/2023
  */
 @CrossOrigin(origins = {"http://localhost:8081", "http://localhost:63342"})
-@RequestMapping(value = "", produces = {"application/json"})
+@RequestMapping(produces = {"application/json"})
 @RestController //
 @Controller
 public class RestHandlerAlquiler
@@ -396,6 +397,7 @@ public class RestHandlerAlquiler
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/cancelarAula/")
     public ResponseEntity<?> deleteCancelarReservaAula(
+                                                        HttpSession session,
                                                         @RequestParam(required=true) final Long idAula,
                                                         @RequestParam(required=true) final Long fecha
     )
@@ -403,12 +405,43 @@ public class RestHandlerAlquiler
 
         try
         {
-            this.reservaAulaRespository.deleteById(new ReservaAulaId(idAula, new Date(fecha)));
+
+            boolean found = false;
+
+            List<ReservaAula> reservaAulaList = (List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA);
+
+            int size = reservaAulaList.size();
+
+            if (reservaAulaList != null)
+            {
+                for (int i = 0; i<size; i++)
+                {
+                    if (reservaAulaList.get(i).getReservaAulaId().getIdAula().equals(idAula) && reservaAulaList.get(i).getReservaAulaId().getFecha().getTime() == fecha)
+                    {
+                        reservaAulaList.remove(reservaAulaList.get(i));
+                        session.setAttribute(Constants.SESSION_RESERVA_AULA, reservaAulaList);
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                if (this.reservaAulaRespository.findById(new ReservaAulaId(idAula, new Date(fecha))).orElse(null) != null)
+                {
+                    this.reservaAulaRespository.deleteById(new ReservaAulaId(idAula, new Date(fecha)));
+                }
+                else
+                {
+                    return ResponseEntity.status(420).body("No se ha encontrado la reserva");
+                }
+            }
 
             return ResponseEntity.ok().build();
         }
         catch (Exception exception)
         {
+            exception.printStackTrace();
             return ResponseEntity.status(590).body(exception.getMessage());
         }
 
@@ -419,16 +452,47 @@ public class RestHandlerAlquiler
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/cancelarTablets/")
     public ResponseEntity<?> deleteCancelarReservaTablets(
+                                                            HttpSession session,
                                                             @RequestParam(required=true) final Long fecha,
                                                             @RequestParam(required=true) final Long idCarritoTablets
     )
     {
-
         try
         {
-            this.reservaCarritoTabletsRepository.deleteById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha)));
+
+            boolean found = false;
+
+            List<ReservaCarritoTablets> reservaCarritoTabletsList = (List<ReservaCarritoTablets>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
+
+            int size = reservaCarritoTabletsList.size();
+
+            if (reservaCarritoTabletsList != null)
+            {
+                for (int i = 0; i<size; i++)
+                {
+                    if (reservaCarritoTabletsList.get(i).getReservaCarritoTabletsId().getIdCarritoTablets().equals(idCarritoTablets) && reservaCarritoTabletsList.get(i).getReservaCarritoTabletsId().getFecha().getTime() == fecha)
+                    {
+                        reservaCarritoTabletsList.remove(reservaCarritoTabletsList.get(i));
+                        session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, reservaCarritoTabletsList);
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                if (this.reservaCarritoTabletsRepository.findById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha))).orElse(null) != null)
+                {
+                    this.reservaCarritoTabletsRepository.deleteById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha)));
+                }
+                else
+                {
+                    return ResponseEntity.status(420).body("No se ha encontrado la reserva");
+                }
+            }
 
             return ResponseEntity.ok().build();
+
         }
         catch (Exception exception)
         {
@@ -442,6 +506,7 @@ public class RestHandlerAlquiler
      */
     @RequestMapping(method = RequestMethod.DELETE, value = "/cancelarOrdenadores/")
     public ResponseEntity<?> deleteCancelarReservaOrdenadores(
+                                                                HttpSession session,
                                                                 @RequestParam(required=true) final Long fecha,
                                                                 @RequestParam(required=true) final Long idCarritoPcs
     )
@@ -449,7 +514,36 @@ public class RestHandlerAlquiler
 
         try
         {
-            this.reservaCarritoPcsRepository.deleteById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha)));
+            boolean found = false;
+
+            List<ReservaCarritoPcs> reservaCarritoPcsList = (List<ReservaCarritoPcs>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
+
+            int size = reservaCarritoPcsList.size();
+
+            if (reservaCarritoPcsList != null)
+            {
+                for (int i = 0; i<size; i++)
+                {
+                    if (reservaCarritoPcsList.get(i).getReservaCarritoPcsId().getIdCarritoPcs().equals(idCarritoPcs) && reservaCarritoPcsList.get(i).getReservaCarritoPcsId().getFecha().getTime() == fecha)
+                    {
+                        reservaCarritoPcsList.remove(reservaCarritoPcsList.get(i));
+                        session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, reservaCarritoPcsList);
+                        found = true;
+                    }
+                }
+            }
+
+            if (!found)
+            {
+                if (this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha))).orElse(null) != null)
+                {
+                    this.reservaCarritoPcsRepository.deleteById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha)));
+                }
+                else
+                {
+                    return ResponseEntity.status(420).body("No se ha encontrado la reserva");
+                }
+            }
 
             return ResponseEntity.ok().build();
         }
