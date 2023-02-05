@@ -14,6 +14,9 @@ import java.util.Map;
 public class ReservaException extends Exception
 {
 
+    @Serial
+    private static final long serialVersionUID = -7271893610401466009L;
+
     /** Constants - Default Error Code */
     private static final String DEFAULT_ERROR_CODE    = "UNEXPECTED_ERROR" ;
 
@@ -22,12 +25,6 @@ public class ReservaException extends Exception
 
     /** Attribute - Code */
     private final String code ;
-
-    /**
-     * Serial version UID
-     */
-    @Serial
-    private static final long serialVersionUID = -5663756522361654649L;
 
     /**
      * Constructor by default

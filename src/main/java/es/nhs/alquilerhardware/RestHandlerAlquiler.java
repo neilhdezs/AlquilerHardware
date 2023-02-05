@@ -4,10 +4,12 @@ package es.nhs.alquilerhardware;
 import es.nhs.alquilerhardware.models.*;
 import es.nhs.alquilerhardware.models.modelsRest.Reservas;
 import es.nhs.alquilerhardware.repository.*;
-import es.nhs.alquilerhardware.utils.*;
+import es.nhs.alquilerhardware.utils.CheckerSession;
+import es.nhs.alquilerhardware.utils.Constants;
+import es.nhs.alquilerhardware.utils.ReservaException;
 import jakarta.servlet.http.HttpSession;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -16,46 +18,69 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
  * @author Neil Hdez
- * @version 1.0.0
- * @since 15/01/2023
+ * this class is a rest controller of the application alquilerhardware
  */
-@CrossOrigin(origins = {"http://localhost:8081", "http://localhost:63342"})
+@CrossOrigin(origins = "http://localhost:8081")
 @RequestMapping(produces = {"application/json"})
 @RestController //
 @Controller
 public class RestHandlerAlquiler
 {
 
-    //TODO: CAMBIAR LAS EXCEPCIONES CON LOGGER Y MOSTRAR POR CONSOLA
-
+    /**
+     * Logger
+     */
     private final Logger LOGGER = LogManager.getLogger(RestHandlerAlquiler.class);
 
+    /**
+     * Repository - of the table aula_informatica
+     */
     @Autowired
     private IAulaInformaticaRepository aulaInformaticaRepository;
 
+    /**
+     * Repository - of the table carrito_pcs
+     */
     @Autowired
     private ICarritoPcsRespository carritoPcsRespository;
 
+    /**
+     * Repository - of the table carrito_tablets
+     */
     @Autowired
     private ICarritoTabletsRepository carritoTabletsRepository;
 
+    /**
+     * Repository - of the table profesor
+     */
     @Autowired
     private IProfesorRepository profesorRepository;
 
+    /**
+     * Repository - of the table reserva_aula
+     */
     @Autowired
     private IReservaAulaRespository reservaAulaRespository;
 
+    /**
+     * Repository - of the table reserva_carrito_tablets
+     */
     @Autowired
     private IReservaCarritoTablets reservaCarritoTabletsRepository;
 
+    /**
+     * Repository - of the table reserva_carrito_pcs
+     */
     @Autowired
     private IReservaCarritoPcsRepository reservaCarritoPcsRepository;
 
+    /**
+     * Repository - of the table reserva_carrito_tablets
+     */
     @Autowired
     private CheckerSession checkerSession;
 
@@ -68,7 +93,6 @@ public class RestHandlerAlquiler
                                             HttpSession session
     )
     {
-
         try
         {
             // Comprobamos la sesion, si no hay reservas inicializamos la lista de reservas
@@ -84,10 +108,12 @@ public class RestHandlerAlquiler
             List<ReservaCarritoTablets> listaReservasTablets = this.reservaCarritoTabletsRepository.findAll();
             List<ReservaCarritoPcs> listaReservasPcs = this.reservaCarritoPcsRepository.findAll();
 
+            LOGGER.info("Se ha obtenido la lista de reservas");
             return ResponseEntity.ok(new Reservas(listaReservasAulas, listaReservasTablets, listaReservasPcs));
         }
         catch (Exception exception)
         {
+            LOGGER.error("Error al obtener la lista de reservas", exception);
             return ResponseEntity.status(590).body(exception.getMessage());
         }
     }
@@ -109,12 +135,14 @@ public class RestHandlerAlquiler
 
             // RELLENAR LAS LISTAS CON LOS DATOS DE LA BASE DE DATOS
 
-            listaReservasAulas = reservaAulaRespository.findAll();
+            listaReservasAulas = this.reservaAulaRespository.findAll();
 
+            LOGGER.info("Se ha obtenido la lista de reservas de aulas");
             return ResponseEntity.ok(listaReservasAulas);
         }
         catch (Exception exception)
         {
+            LOGGER.error("Error al obtener la lista de reservas de aulas", exception);
             return ResponseEntity.status(590).body(exception.getMessage());
         }
     }
@@ -139,10 +167,12 @@ public class RestHandlerAlquiler
 
             listaReservasTablets = reservaCarritoTabletsRepository.findAll();
 
+            LOGGER.info("Se ha obtenido la lista de reservas de tablets");
             return ResponseEntity.ok(listaReservasTablets);
         }
         catch (Exception exception)
         {
+            LOGGER.error("Error al obtener la lista de reservas de tablets", exception);
             return ResponseEntity.status(590).body(exception.getMessage());
         }
     }
@@ -165,13 +195,14 @@ public class RestHandlerAlquiler
 
             // RELLENAR LAS LISTAS CON LOS DATOS DE LA BASE DE DATOS
 
-            listaReservasPcs = reservaCarritoPcsRepository.findAll();
+            listaReservasPcs = this.reservaCarritoPcsRepository.findAll();
 
-
+            LOGGER.info("Se ha obtenido la lista de reservas de pcs");
             return ResponseEntity.ok(listaReservasPcs);
         }
         catch (Exception exception)
         {
+            LOGGER.error("Error al obtener la lista de reservas de pcs", exception);
             return ResponseEntity.status(590).body(exception.getMessage());
         }
     }
@@ -207,28 +238,32 @@ public class RestHandlerAlquiler
 
             if (profesor != null && aulaInformatica != null)
             {
+                LOGGER.info("Se ha reservado el aula correctamente");
                 reservaAula = new ReservaAula(new ReservaAulaId(idAula, new Date(fecha)), profesor, aulaInformatica);
-
                 ((List<ReservaAula>)session.getAttribute(Constants.SESSION_RESERVA_AULA)).add(reservaAula);
             }
             else
             {
                 LOGGER.error("Error al reservar el aula, profesor o aula no encontrados");
-                return ResponseEntity.status(420).body("profesor o aula no encontrados");
+                throw new ReservaException("420", "profesor o aula no encontrados");
             }
 
             return ResponseEntity.ok(reservaAula);
         }
+        catch (ReservaException reservaException)
+        {
+            LOGGER.error("Error al reservar el aula, profesor o aula no encontrados", reservaException);
+            return ResponseEntity.status(420).body(reservaException.getMessage());
+        }
         catch (Exception exception)
         {
             LOGGER.error("Error al reservar el aula", exception);
-            exception.printStackTrace();
             return ResponseEntity.status(590).body("Error al reservar el aula");
         }
     }
 
     /**
-     * Metodo en el que se genera una reserva de un carrito de tablets
+     * Metodo en el que se genera una reserva de un carrito de tablets y se almacenara en la base de datos
      */
     @RequestMapping(method = RequestMethod.POST, value = "/tablets/")
     public ResponseEntity<?> postReservarTablets(
@@ -243,20 +278,19 @@ public class RestHandlerAlquiler
         // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, checkerSession.checkSessionReservaCarritoTablets((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)));
 
-
         // VAMOS A VER SI HAY CARRITOS DISPONIBLES EN ESA FECHA
 
         ReservaCarritoTablets reservaCarritoTablets = this.reservaCarritoTabletsRepository.findById(new ReservaCarritoTabletsId(idCarritoTablet, new Date(fecha))).orElse(null);
 
-        if (reservaCarritoTablets != null)
-        {
-            return ResponseEntity.status(420).body("Ya existe una reserva para ese carrito en esa fecha");
-        }
-
-        // SI NO HAY RESERVAS REALIZADAS HAY CARRITOS DISPONIBLES PARA ESA FECHA
-
         try
         {
+            if (reservaCarritoTablets != null)
+            {
+                throw new ReservaException("420", "Ya existe una reserva para ese carrito de tablets en esa fecha");
+            }
+
+            // SI NO HAY RESERVAS REALIZADAS HAY CARRITOS DISPONIBLES PARA ESA FECHA
+
             Profesor profesor;
 
             CarritoTablets carritoTablets;
@@ -267,6 +301,7 @@ public class RestHandlerAlquiler
 
             if (profesor != null && carritoTablets != null)
             {
+                LOGGER.info("Se ha reservado el carrito de tablets correctamente");
                 reservaCarritoTablets = new ReservaCarritoTablets(new ReservaCarritoTabletsId(idCarritoTablet, new Date(fecha)), profesor, carritoTablets, aulaDestino);
 
                 ((List<ReservaCarritoTablets>)session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)).add(reservaCarritoTablets);
@@ -275,7 +310,6 @@ public class RestHandlerAlquiler
             {
                 throw new ReservaException("420", "profesor o carrito de tablets no encontrados");
             }
-
 
             return ResponseEntity.ok(reservaCarritoTablets);
 
@@ -307,15 +341,16 @@ public class RestHandlerAlquiler
         // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, checkerSession.checkSessionReservaCarritoPcs((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)));
 
-        ReservaCarritoPcs reservaCarritoPcs = this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPc, new Date(fecha))).orElse(null);
-
-        if (reservaCarritoPcs != null)
-        {
-            return ResponseEntity.status(420).body("Ya existe una reserva para ese carrito de pcs en esa fecha");
-        }
-
         try
         {
+            ReservaCarritoPcs reservaCarritoPcs = this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPc, new Date(fecha))).orElse(null);
+
+            if (reservaCarritoPcs != null)
+            {
+                throw new ReservaException("420", "Ya existe una reserva para ese carrito de pcs en esa fecha");
+            }
+
+
             Profesor profesor;
 
             CarritoPcs carritoPcs;
@@ -326,12 +361,9 @@ public class RestHandlerAlquiler
 
             if (profesor != null && carritoPcs != null)
             {
-
                 reservaCarritoPcs = new ReservaCarritoPcs(new ReservaCarritoPcsId(idCarritoPc, new Date(fecha)), profesor, carritoPcs, aulaDestino);
 
                 ((List<ReservaCarritoPcs>)session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)).add(reservaCarritoPcs);
-
-
             }
             else
             {
@@ -340,6 +372,10 @@ public class RestHandlerAlquiler
 
             return ResponseEntity.ok(reservaCarritoPcs);
 
+        }
+        catch (ReservaException reservaException)
+        {
+            return ResponseEntity.status(Integer.parseInt(reservaException.getCode())).body(reservaException.getMessage());
         }
         catch (Exception exception)
         {
@@ -365,20 +401,24 @@ public class RestHandlerAlquiler
 
             if (reservaAulaList != null)
             {
+                LOGGER.info("Reserva Aula Insertada en la base de datos");
                 this.reservaAulaRespository.saveAllAndFlush(reservaAulaList);
             }
 
             if (reservaCarritoTablets != null)
             {
+                LOGGER.info("Reserva Carrito Tablets Insertada en la base de datos");
                 this.reservaCarritoTabletsRepository.saveAllAndFlush(reservaCarritoTablets);
             }
 
             if (reservaCarritoPcs != null)
             {
+                LOGGER.info("Reserva Carrito Pcs Insertada en la base de datos");
                 this.reservaCarritoPcsRepository.saveAllAndFlush(reservaCarritoPcs);
             }
 
-
+            // Limpiamos la session
+            LOGGER.info("Limpiando la session");
             session.removeAttribute(Constants.SESSION_RESERVA_AULA);
             session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
             session.removeAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
@@ -387,9 +427,9 @@ public class RestHandlerAlquiler
         }
         catch (Exception exception)
         {
+            LOGGER.error("Error al confirmar la reserva", exception);
             return ResponseEntity.status(590).body(exception.getMessage());
         }
-
     }
 
     /**
@@ -402,11 +442,8 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long fecha
     )
     {
-
         try
         {
-
-            boolean found = false;
 
             List<ReservaAula> reservaAulaList = (List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA);
 
@@ -420,31 +457,33 @@ public class RestHandlerAlquiler
                     {
                         reservaAulaList.remove(reservaAulaList.get(i));
                         session.setAttribute(Constants.SESSION_RESERVA_AULA, reservaAulaList);
-                        found = true;
+                        LOGGER.info("Se ha eliminado la reserva del carrito");
+                        return ResponseEntity.ok().build();
                     }
                 }
             }
 
-            if (!found)
+            if (this.reservaAulaRespository.findById(new ReservaAulaId(idAula, new Date(fecha))).orElse(null) != null)
             {
-                if (this.reservaAulaRespository.findById(new ReservaAulaId(idAula, new Date(fecha))).orElse(null) != null)
-                {
-                    this.reservaAulaRespository.deleteById(new ReservaAulaId(idAula, new Date(fecha)));
-                }
-                else
-                {
-                    return ResponseEntity.status(420).body("No se ha encontrado la reserva");
-                }
+                LOGGER.info("Se ha encontrado la reserva");
+                this.reservaAulaRespository.deleteById(new ReservaAulaId(idAula, new Date(fecha)));
+            }
+            else
+            {
+                throw new ReservaException("420","No se ha encontrado la reserva");
             }
 
             return ResponseEntity.ok().build();
         }
+        catch (ReservaException reservaException)
+        {
+            LOGGER.error(reservaException.getMessage());
+            return ResponseEntity.status(Integer.parseInt(reservaException.getCode())).body(reservaException.getMessage());
+        }
         catch (Exception exception)
         {
-            exception.printStackTrace();
             return ResponseEntity.status(590).body(exception.getMessage());
         }
-
     }
 
     /**
@@ -453,14 +492,12 @@ public class RestHandlerAlquiler
     @RequestMapping(method = RequestMethod.DELETE, value = "/cancelarTablets/")
     public ResponseEntity<?> deleteCancelarReservaTablets(
                                                             HttpSession session,
-                                                            @RequestParam(required=true) final Long fecha,
-                                                            @RequestParam(required=true) final Long idCarritoTablets
+                                                            @RequestParam(required=true) final Long idCarritoTablets,
+                                                            @RequestParam(required=true) final Long fecha
     )
     {
         try
         {
-
-            boolean found = false;
 
             List<ReservaCarritoTablets> reservaCarritoTabletsList = (List<ReservaCarritoTablets>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
 
@@ -474,31 +511,34 @@ public class RestHandlerAlquiler
                     {
                         reservaCarritoTabletsList.remove(reservaCarritoTabletsList.get(i));
                         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, reservaCarritoTabletsList);
-                        found = true;
+                        LOGGER.info("Se ha eliminado la reserva de la sesion");
+                        return ResponseEntity.ok().build();
                     }
                 }
             }
 
-            if (!found)
+            if (this.reservaCarritoTabletsRepository.findById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha))).orElse(null) != null)
             {
-                if (this.reservaCarritoTabletsRepository.findById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha))).orElse(null) != null)
-                {
-                    this.reservaCarritoTabletsRepository.deleteById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha)));
-                }
-                else
-                {
-                    return ResponseEntity.status(420).body("No se ha encontrado la reserva");
-                }
+                LOGGER.info("Se ha encontrado la reserva");
+                this.reservaCarritoTabletsRepository.deleteById(new ReservaCarritoTabletsId(idCarritoTablets, new Date(fecha)));
+            }
+            else
+            {
+                throw new ReservaException("420","No se ha encontrado la reserva");
             }
 
             return ResponseEntity.ok().build();
 
         }
+        catch (ReservaException reservaException)
+        {
+            LOGGER.error(reservaException.getMessage());
+            return ResponseEntity.status(Integer.parseInt(reservaException.getCode())).body(reservaException.getMessage());
+        }
         catch (Exception exception)
         {
             return ResponseEntity.status(590).body(exception.getMessage());
         }
-
     }
 
     /**
@@ -507,51 +547,52 @@ public class RestHandlerAlquiler
     @RequestMapping(method = RequestMethod.DELETE, value = "/cancelarOrdenadores/")
     public ResponseEntity<?> deleteCancelarReservaOrdenadores(
                                                                 HttpSession session,
-                                                                @RequestParam(required=true) final Long fecha,
-                                                                @RequestParam(required=true) final Long idCarritoPcs
+                                                                @RequestParam(required=true) final Long idCarritoPcs,
+                                                                @RequestParam(required=true) final Long fecha
     )
     {
-
         try
         {
-            boolean found = false;
 
             List<ReservaCarritoPcs> reservaCarritoPcsList = (List<ReservaCarritoPcs>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS);
 
-            int size = reservaCarritoPcsList.size();
-
             if (reservaCarritoPcsList != null)
             {
+                int size = reservaCarritoPcsList.size();
                 for (int i = 0; i<size; i++)
                 {
                     if (reservaCarritoPcsList.get(i).getReservaCarritoPcsId().getIdCarritoPcs().equals(idCarritoPcs) && reservaCarritoPcsList.get(i).getReservaCarritoPcsId().getFecha().getTime() == fecha)
                     {
                         reservaCarritoPcsList.remove(reservaCarritoPcsList.get(i));
                         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, reservaCarritoPcsList);
-                        found = true;
+                        LOGGER.info("Se ha eliminado la reserva de la sesion");
+                        return ResponseEntity.ok().build();
                     }
                 }
             }
 
-            if (!found)
+
+            if (this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha))).orElse(null) != null)
             {
-                if (this.reservaCarritoPcsRepository.findById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha))).orElse(null) != null)
-                {
-                    this.reservaCarritoPcsRepository.deleteById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha)));
-                }
-                else
-                {
-                    return ResponseEntity.status(420).body("No se ha encontrado la reserva");
-                }
+                LOGGER.info("Se ha eliminado la reserva de la base de datos");
+                this.reservaCarritoPcsRepository.deleteById(new ReservaCarritoPcsId(idCarritoPcs, new Date(fecha)));
+            }
+            else
+            {
+                throw new ReservaException("420","No se ha encontrado la reserva");
             }
 
+
             return ResponseEntity.ok().build();
+        }
+        catch (ReservaException exception)
+        {
+            LOGGER.error(exception.getMessage());
+            return ResponseEntity.status(Integer.parseInt(exception.getCode())).body(exception.getMessage());
         }
         catch (Exception exception)
         {
             return ResponseEntity.status(590).body(exception.getMessage());
         }
-
     }
-
 }

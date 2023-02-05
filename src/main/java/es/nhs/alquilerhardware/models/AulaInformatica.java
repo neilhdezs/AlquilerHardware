@@ -4,59 +4,43 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Neil Hdez
- * @version 1.0.0
- * @since 11/01/2023
+ * Class that contains the information of the computer classroom
  */
-
 @Entity
 @Table(name = "aula_informatica")
+@Getter
+@Setter
 public class AulaInformatica
 {
+    /**
+     * Attribute - Classroom identifier
+     */
     @Id
     @Column(length = 10)
-    private Long id;
+    private Long    id;
 
+    /**
+     * Attribute - Classroom number
+     */
     @Column(length = 2, nullable = false)
     private Integer numeroAula;
 
+    /**
+     * Attribute - Classroom floor
+     */
     @Column(length = 1, nullable = false)
     private Integer planta;
 
+    /**
+     * Constructor empty
+     */
     public AulaInformatica()
     {
 
-    }
-
-    public Long getId()
-    {
-        return id;
-    }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
-
-    public Integer getNumeroAula()
-    {
-        return numeroAula;
-    }
-
-    public void setNumeroAula(Integer numeroAula)
-    {
-        this.numeroAula = numeroAula;
-    }
-
-    public Integer getPlanta()
-    {
-        return planta;
-    }
-
-    public void setPlanta(Integer planta)
-    {
-        this.planta = planta;
     }
 }

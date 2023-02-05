@@ -20,7 +20,7 @@ produces:  #Para que todos respondan con lo mismo
 
 paths:
 
-  /:
+  /reservas/:
     get:
       operationId: getReservas
       description: Metodo que retorna todas las reservas de aulas y carros de todas las semanas hasta final de curso
@@ -30,26 +30,76 @@ paths:
         200:
           description: Objeto de Tipo Reservas en el que se listan todas las reservas de aulas y carros de todas las semanas hasta final de curso
           schema:
-            $ref: "#/definitions/ListadoReservas"
+            $ref: "#/definitions/Reservas"
 
-        503:
-          description: Error al descargar los datos de la base de datos
+        590:
+          description: Error al obtener la lista de reservas
           schema:
             $ref: "#/definitions/ReservaException"
+
+  /reservas/aulas/:
+    get:
+      operationId: getReservasAulas
+      description: Metodo que retorna todas las reservas de aulas de todas las semanas hasta final de curso
+      produces:
+        - application/json
+      responses:
+        200:
+          description: lista con las reservas de las aulas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ReservaAula'
+
+        590:
+          description: Error al obtener la lista de reservas
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /reservas/tablets/:
+    get:
+      operationId: getReservasTablets
+      description: Metodo que retorna todas las reservas de tablets de todas las semanas hasta final de curso
+      produces:
+        - application/json
+      responses:
+        200:
+          description: lista con las reservas de los carritos de tables
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ReservaCarritoTablets'
+
+        590:
+          description: Error al obtener la lista de reservas
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /reservas/pcs/:
+    get:
+      operationId: getReservasPcs
+      description: Metodo que retorna todas las reservas de pcs de todas las semanas hasta final de curso
+      produces:
+        - application/json
+      responses:
+        200:
+          description: lista con las reservas de los carritos de pcs
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ReservaCarritoPcs'
+
+        590:
+          description: Error al obtener la lista de reservas
+
 
   /aula/:
     post:
       operationId: postReservarAula
       description: Metodo en el que un profesor realiza una reserva de una aula en una fecha y lo guarda en la sesion
       parameters:
-        - name: idAutorReserva
+        - name: idProfesor
           description: se indica el id de la persona que ha hecho la reserva
-          in: query
-          type: integer
-          format: int64
-          required: true
-        - name: fechaReserva
-          description: se indica la fecha en la que se ha hecho la reserva
           in: query
           type: integer
           format: int64
@@ -60,15 +110,26 @@ paths:
           type: integer
           format: int64
           required: true
+        - name: fecha
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
 
       responses:
         200:
-          description: Todo ha ido bien y se ha almacenado en la sesión correctamente la reserva
+          description: Todo ha ido bien y se ha almacenado en la sesión correctamente la reserva, devuelve la reserva realizada
+          schema:
+            $ref: '#/definitions/ReservaAula'
 
-        422:
-          description: Error al pasar los parametros
+        420:
+          description: Error al reservar el aula, profesor o aula no encontrados
           schema:
             $ref: "#/definitions/ReservaException"
+
+        590:
+          description: Error al reserva el aula
 
   /tablets/:
     post:
@@ -100,20 +161,20 @@ paths:
           format: int64
           required: true
 
-
       responses:
         200:
           description: Todo ha ido bien y se ha almacenado en la sesión correctamente la reserva
+          schema:
+            $ref: '#/definitions/ReservaCarritoTablets'
 
         420:
-          description: Error al Profesor, aula o carrito inexistente
-          schema:
-              $ref: "#/definitions/ReservaException"
-
-        422:
-          description: Error al pasar los parametros
+          description: Error el Profesor, aula o carrito inexistente
           schema:
             $ref: "#/definitions/ReservaException"
+
+        590:
+          description: Error
+
 
   /ordenadores/:
     post:
@@ -152,6 +213,10 @@ paths:
           schema:
             $ref: "#/definitions/ReservaException"
 
+        590:
+          description: Error
+
+
   /confirmar/:
     post:
       operationId: postConfirmarReserva
@@ -160,17 +225,106 @@ paths:
         200:
           description: Todo ha ido bien y he cogido los datos que hay en la sesión y los he almacenado
 
-        503:
-          description: Error al cargar los datos en la base de datos
+        590:
+          description: Error
+
+  /cancelarAula/:
+    delete:
+      operationId: deleteCancelarReservaAula
+      description: Elimina una reserva de un aula en la sesión y si no la encuentra en la base de datos
+      parameters:
+        - name: idAula
+          description: se indica el id del aula que se quiere eliminar
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: fecha
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+      responses:
+        200:
+          description: La reserva ha sido borrada correctamente
+
+        420:
+          description: La reserva no se ha encontrado ni en la base de datos ni en la sesion
+          schema:
+            $ref: '#/definitions/ReservaException'
+
+        590:
+          description: Error
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /cancelarTablets/:
+    delete:
+      operationId: deleteCancelarReservaTablets
+      description: Elimina una reserva de carrito tablets en la sesión y si no la encuentra en la base de datos
+      parameters:
+        - name: idCarritoTablets
+          description: se indica el id del carrito de tablets que se quiere eliminar
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: fecha
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+      responses:
+        200:
+          description: La reserva ha sido borrada correctamente
+
+        420:
+          description: La reserva no se ha encontrado ni en la base de datos ni en la sesion
+          schema:
+            $ref: '#/definitions/ReservaException'
+
+        590:
+          description: Error
+          schema:
+            $ref: "#/definitions/ReservaException"
+
+  /cancelarOrdenadores/:
+    delete:
+      operationId: deleteCancelarReservaOrdenadores
+      description: Elimina una reserva de carrito ordenadores en la sesión y si no la encuentra en la base de datos
+      parameters:
+        - name: idCarritoPcs
+          description: se indica el id del carrito de ordenadores que se quiere eliminar
+          in: query
+          type: integer
+          format: int64
+          required: true
+        - name: fecha
+          description: se indica la fecha en la que se ha hecho la reserva
+          in: query
+          type: integer
+          format: int64
+          required: true
+      responses:
+        200:
+          description: La reserva ha sido borrada correctamente
+
+        420:
+          description: La reserva no se ha encontrado ni en la base de datos ni en la sesion
+          schema:
+            $ref: '#/definitions/ReservaException'
+
+        590:
+          description: Error
           schema:
             $ref: "#/definitions/ReservaException"
 
 
-
-
 definitions:
 
-  ListadoReservas:
+  Reservas:
     type: object
     properties:
 
@@ -184,13 +338,13 @@ definitions:
         description: Lisa en la que se encuentran todas las reservas de carros de tablets hasta final de curso
         type: array
         items:
-          $ref: "#/definitions/ReservaPcs"
+          $ref: "#/definitions/ReservaCarritoPcs"
 
       listaReservasOrdenadores:
         description: Lisa en la que se encuentran todas las reservas de carros de ordenadores hasta final de curso
         type: array
         items:
-          $ref: "#/definitions/ReservaTablets"
+          $ref: "#/definitions/ReservaCarritoTablets"
 
   ReservaAula:
     type: object
@@ -211,7 +365,7 @@ definitions:
         type: integer
         format: int64
 
-  ReservaPcs:
+  ReservaCarritoPcs:
     type: object
     properties:
 
@@ -235,7 +389,7 @@ definitions:
         type: integer
         format: int64
 
-  ReservaTablets:
+  ReservaCarritoTablets:
     type: object
     properties:
 

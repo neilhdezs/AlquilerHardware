@@ -4,60 +4,40 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Neil Hdez
- * @version 1.0.0
- * @since 11/01/2023
+ * this class is a model of the table profesor
  */
-
 @Entity
 @Table(name = "profesor")
+@Getter
+@Setter
 public class Profesor
 {
 
+    /**
+     * Attribute - professor identifier
+     */
     @Id
     @Column(length = 10)
-    private Long id;
+    private Long   id;
 
+    /**
+     * Attribute - professor name
+     */
     @Column(length = 25, nullable = false)
     private String nombre;
 
+    /**
+     * Attribute - professor surname
+     */
     @Column(length = 50, nullable = false)
     private String apellidos;
 
     public Profesor()
     {
-
-    }
-
-    public Long getId()
-    {
-        return id;
-    }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
-
-    public String getNombre()
-    {
-        return nombre;
-    }
-
-    public void setNombre(String nombre)
-    {
-        this.nombre = nombre;
-    }
-
-    public String getApellidos()
-    {
-        return apellidos;
-    }
-
-    public void setApellidos(String apellidos)
-    {
-        this.apellidos = apellidos;
     }
 }

@@ -4,72 +4,51 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Neil Hdez
- * @version 1.0.0
- * @since 11/01/2023
+ * this class is a model of the table carrito_pcs
  */
 @Entity
 @Table(name = "carrito_pcs")
+@Getter
+@Setter
 public class CarritoPcs
 {
 
+    /**
+     * Attribute - cart identifier
+     */
     @Id
     @Column(length = 10)
-    private Long id;
+    private Long    id;
 
+    /**
+     * Attribute - number of pcs in the cart
+     */
     @Column(length = 10, nullable = false)
     private Integer numeroPcs;
 
+    /**
+     * Attribute - floor number of the cart
+     */
     @Column(length = 1, nullable = false)
     private Integer planta;
 
+    /**
+     * Attribute - operating system of the pc
+     */
     @Column(length = 25, nullable = false)
-    private String sistemaOperativo;
+    private String  sistemaOperativo;
 
+    /**
+     * Constructor empty
+     */
     public CarritoPcs()
     {
 
     }
 
-    public Long getId()
-    {
-        return id;
-    }
-
-    public void setId(Long id)
-    {
-        this.id = id;
-    }
-
-    public Integer getNumeroPcs()
-    {
-        return numeroPcs;
-    }
-
-    public void setNumeroPcs(Integer numeroPcs)
-    {
-        this.numeroPcs = numeroPcs;
-    }
-
-    public Integer getPlanta()
-    {
-        return planta;
-    }
-
-    public void setPlanta(Integer planta)
-    {
-        this.planta = planta;
-    }
-
-    public String getSistemaOperativo()
-    {
-        return sistemaOperativo;
-    }
-
-    public void setSistemaOperativo(String sistemaOperativo)
-    {
-        this.sistemaOperativo = sistemaOperativo;
-    }
 }

@@ -1,83 +1,68 @@
 package es.nhs.alquilerhardware.models;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @author Neil Hdez
- * @version 1.0.0
- * @since 11/01/2023
+ * this class is a model of the table reserva_carrito_tablets
  */
 
 @Entity
 @Table(name = "reserva_carrito_tablets")
+@Getter
+@Setter
 public class ReservaCarritoTablets
 {
 
+    /**
+     * Attribute - reservation identifier
+     */
     @EmbeddedId
     private ReservaCarritoTabletsId reservaCarritoTabletsId;
 
+    /**
+     * Attribute - professor identifier
+     */
     @ManyToOne
     @JoinColumn(name = "id_profesor")
-    private Profesor idProfesor;
+    private Profesor                idProfesor;
 
+    /**
+     * Attribute - classroom identifier
+     */
     @ManyToOne
     @JoinColumn(name = "id_carrito_tablets")
     @MapsId("idCarritoTablets")
-    private CarritoTablets idCarritoTablets;
+    private CarritoTablets          idCarritoTablets;
 
+    /**
+     * Attribute - location of the loan
+     */
     @Column
-    private String ubicacionPrestamo;
+    private String                  ubicacionPrestamo;
 
+    /**
+     * Constructor empty
+     */
     public ReservaCarritoTablets()
     {
 
     }
 
+    /**
+     * Constructor with parameters
+     * @param reservaCarritoTabletsId reservation identifier
+     * @param idProfesor professor identifier
+     * @param idCarritoTablets classroom identifier
+     * @param ubicacionPrestamo location of the loan
+     */
     public ReservaCarritoTablets(ReservaCarritoTabletsId reservaCarritoTabletsId, Profesor idProfesor, CarritoTablets idCarritoTablets, String ubicacionPrestamo)
     {
         this.reservaCarritoTabletsId = reservaCarritoTabletsId;
         this.idProfesor = idProfesor;
         this.idCarritoTablets = idCarritoTablets;
-        this.ubicacionPrestamo = ubicacionPrestamo;
-    }
-
-    public ReservaCarritoTabletsId getReservaCarritoTabletsId()
-    {
-        return reservaCarritoTabletsId;
-    }
-
-    public void setReservaCarritoTabletsId(ReservaCarritoTabletsId reservaCarritoTabletsId)
-    {
-        this.reservaCarritoTabletsId = reservaCarritoTabletsId;
-    }
-
-    public Profesor getIdProfesor()
-    {
-        return idProfesor;
-    }
-
-    public void setIdProfesor(Profesor idProfesor)
-    {
-        this.idProfesor = idProfesor;
-    }
-
-    public CarritoTablets getIdCarritoTablets()
-    {
-        return idCarritoTablets;
-    }
-
-    public void setIdCarritoTablets(CarritoTablets idCarritoTablets)
-    {
-        this.idCarritoTablets = idCarritoTablets;
-    }
-
-    public String getUbicacionPrestamo()
-    {
-        return ubicacionPrestamo;
-    }
-
-    public void setUbicacionPrestamo(String ubicacionPrestamo)
-    {
         this.ubicacionPrestamo = ubicacionPrestamo;
     }
 }
