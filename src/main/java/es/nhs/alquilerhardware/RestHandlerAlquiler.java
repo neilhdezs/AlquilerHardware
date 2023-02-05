@@ -325,7 +325,6 @@ public class RestHandlerAlquiler
             {
                 LOGGER.info("Se ha reservado el carrito de tablets correctamente");
                 reservaCarritoTablets = new ReservaCarritoTablets(new ReservaCarritoTabletsId(idCarritoTablet, new Date(fecha)), profesor, carritoTablets, aulaDestino);
-
                 ((List<ReservaCarritoTablets>)session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)).add(reservaCarritoTablets);
             }
             else
@@ -388,8 +387,8 @@ public class RestHandlerAlquiler
 
             if (profesor != null && carritoPcs != null)
             {
+                LOGGER.info("Se ha reservado el carrito de pcs correctamente");
                 reservaCarritoPcs = new ReservaCarritoPcs(new ReservaCarritoPcsId(idCarritoPc, new Date(fecha)), profesor, carritoPcs, aulaDestino);
-
                 ((List<ReservaCarritoPcs>)session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)).add(reservaCarritoPcs);
             }
             else
@@ -474,17 +473,15 @@ public class RestHandlerAlquiler
 
             List<ReservaAula> reservaAulaList = (List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA);
 
-            int size = reservaAulaList.size();
-
             if (reservaAulaList != null)
             {
-                for (int i = 0; i<size; i++)
+                for (ReservaAula reservaAula : reservaAulaList)
                 {
-                    if (reservaAulaList.get(i).getReservaAulaId().getIdAula().equals(idAula) && reservaAulaList.get(i).getReservaAulaId().getFecha().getTime() == fecha)
+                    if (reservaAula.getReservaAulaId().getIdAula().equals(idAula) && reservaAula.getReservaAulaId().getFecha().getTime() == fecha)
                     {
-                        reservaAulaList.remove(reservaAulaList.get(i));
+                        reservaAulaList.remove(reservaAula);
                         session.setAttribute(Constants.SESSION_RESERVA_AULA, reservaAulaList);
-                        LOGGER.info("Se ha eliminado la reserva del carrito");
+                        LOGGER.info("Se ha eliminado la reserva de aula de la session");
                         return ResponseEntity.ok().build();
                     }
                 }
@@ -528,17 +525,15 @@ public class RestHandlerAlquiler
 
             List<ReservaCarritoTablets> reservaCarritoTabletsList = (List<ReservaCarritoTablets>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS);
 
-            int size = reservaCarritoTabletsList.size();
-
             if (reservaCarritoTabletsList != null)
             {
-                for (int i = 0; i<size; i++)
+                for (ReservaCarritoTablets reservaCarritoTablets : reservaCarritoTabletsList)
                 {
-                    if (reservaCarritoTabletsList.get(i).getReservaCarritoTabletsId().getIdCarritoTablets().equals(idCarritoTablets) && reservaCarritoTabletsList.get(i).getReservaCarritoTabletsId().getFecha().getTime() == fecha)
+                    if (reservaCarritoTablets.getReservaCarritoTabletsId().getIdCarritoTablets().equals(idCarritoTablets) && reservaCarritoTablets.getReservaCarritoTabletsId().getFecha().getTime() == fecha)
                     {
-                        reservaCarritoTabletsList.remove(reservaCarritoTabletsList.get(i));
+                        reservaCarritoTabletsList.remove(reservaCarritoTablets);
                         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, reservaCarritoTabletsList);
-                        LOGGER.info("Se ha eliminado la reserva de la sesion");
+                        LOGGER.info("Se ha eliminado la reserva del carrito de tablets de la session");
                         return ResponseEntity.ok().build();
                     }
                 }
@@ -591,7 +586,7 @@ public class RestHandlerAlquiler
                     {
                         reservaCarritoPcsList.remove(reservaCarritoPcs);
                         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, reservaCarritoPcsList);
-                        LOGGER.info("Se ha eliminado la reserva de la sesion");
+                        LOGGER.info("Se ha eliminado la reserva de carrito de pcs la sesion");
                         return ResponseEntity.ok().build();
                     }
                 }
