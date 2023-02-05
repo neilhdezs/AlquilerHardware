@@ -4,6 +4,7 @@ package es.nhs.alquilerhardware;
 import es.nhs.alquilerhardware.models.*;
 import es.nhs.alquilerhardware.models.modelsRest.Reservas;
 import es.nhs.alquilerhardware.repository.*;
+import es.nhs.alquilerhardware.utils.CheckerDayOfWeek;
 import es.nhs.alquilerhardware.utils.CheckerSession;
 import es.nhs.alquilerhardware.utils.Constants;
 import es.nhs.alquilerhardware.utils.ReservaException;
@@ -27,9 +28,11 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:8081")
 @RequestMapping(produces = {"application/json"})
 @RestController //
-@Controller
 public class RestHandlerAlquiler
 {
+
+    //TODO: Fines de Semana
+    //TODO: Cambiar for de eliminar por un for mejor
 
     /**
      * Logger
@@ -79,10 +82,16 @@ public class RestHandlerAlquiler
     private IReservaCarritoPcsRepository reservaCarritoPcsRepository;
 
     /**
-     * Repository - of the table reserva_carrito_tablets
+     * Class - used to check the session
      */
     @Autowired
     private CheckerSession checkerSession;
+
+    /**
+     * Class - used to check the day of the week
+     */
+    @Autowired
+    private CheckerDayOfWeek checkerDayOfWeek;
 
 
     /**
@@ -219,6 +228,13 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long fecha
     )
     {
+
+        if (checkerDayOfWeek.isWeekend(new Date(fecha)))
+        {
+            LOGGER.error("Error al reservar el aula, no se puede reservar un aula los fines de semana");
+            return ResponseEntity.status(495).body("No se puede reservar un aula los fines de semana");
+        }
+
         // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
         session.setAttribute(Constants.SESSION_RESERVA_AULA, checkerSession.checkSessionReservaAula((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_AULA)));
 
@@ -274,6 +290,12 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long idCarritoTablet
     )
     {
+
+        if (checkerDayOfWeek.isWeekend(new Date(fecha)))
+        {
+            LOGGER.error("Error al reservar el carrito de tablets, no se puede reservar un carrito de tablets los fines de semana");
+            return ResponseEntity.status(495).body("No se puede reservar un carrito de tablets los fines de semana");
+        }
 
         // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS, checkerSession.checkSessionReservaCarritoTablets((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_TABLETS)));
@@ -337,6 +359,11 @@ public class RestHandlerAlquiler
                                                         @RequestParam(required=true) final Long idCarritoPc
     )
     {
+        if (checkerDayOfWeek.isWeekend(new Date(fecha)))
+        {
+            LOGGER.error("Error al reservar el carrito de pcs, no se puede reservar un carrito de pcs los fines de semana");
+            return ResponseEntity.status(495).body("No se puede reservar un carrito de pcs los fines de semana");
+        }
 
         // Por si Accede directamente a este endpoint sin pasar por el de getReservas, checkeamos la session y en caso de que sea nula la inicializamos
         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, checkerSession.checkSessionReservaCarritoPcs((List<ReservaAula>) session.getAttribute(Constants.SESSION_RESERVA_CARRITO_PCS)));
@@ -558,12 +585,11 @@ public class RestHandlerAlquiler
 
             if (reservaCarritoPcsList != null)
             {
-                int size = reservaCarritoPcsList.size();
-                for (int i = 0; i<size; i++)
+                for (ReservaCarritoPcs reservaCarritoPcs : reservaCarritoPcsList)
                 {
-                    if (reservaCarritoPcsList.get(i).getReservaCarritoPcsId().getIdCarritoPcs().equals(idCarritoPcs) && reservaCarritoPcsList.get(i).getReservaCarritoPcsId().getFecha().getTime() == fecha)
+                    if (reservaCarritoPcs.getReservaCarritoPcsId().getIdCarritoPcs().equals(idCarritoPcs) && reservaCarritoPcs.getReservaCarritoPcsId().getFecha().getTime() == fecha)
                     {
-                        reservaCarritoPcsList.remove(reservaCarritoPcsList.get(i));
+                        reservaCarritoPcsList.remove(reservaCarritoPcs);
                         session.setAttribute(Constants.SESSION_RESERVA_CARRITO_PCS, reservaCarritoPcsList);
                         LOGGER.info("Se ha eliminado la reserva de la sesion");
                         return ResponseEntity.ok().build();

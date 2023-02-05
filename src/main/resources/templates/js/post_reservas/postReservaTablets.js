@@ -12,7 +12,9 @@ function crearReserva()
         if (reservaStatus === 200) {
             alert("Reserva creada correctamente, Por confirmar");
             //window.location.href = "../index.html";
-        } else {
+        } else if (reservaStatus === 495) {
+            alert("No se puede realizar una reserva en fin de semana")
+        }  else {
             alert("Error al crear la reserva");
             //window.location.href = "../index.html";
         }

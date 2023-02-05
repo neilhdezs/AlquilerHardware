@@ -8,8 +8,7 @@ import java.util.List;
 
 /**
  * @author Neil Hdez
- * @version 1.0.0
- * @since 30/01/2023
+ * this class is used to check if the session is null or not
  */
 @Service
 public class CheckerSession
