@@ -25,14 +25,10 @@ import java.util.List;
  * @author Neil Hdez
  * this class is a rest controller of the application alquilerhardware
  */
-@CrossOrigin(origins = "http://localhost:8081")
 @RequestMapping(produces = {"application/json"})
 @RestController //
 public class RestHandlerAlquiler
 {
-
-    //TODO: Fines de Semana
-    //TODO: Cambiar for de eliminar por un for mejor
 
     /**
      * Logger
