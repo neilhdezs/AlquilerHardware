@@ -1,0 +1,39 @@
+1. NUMERO TOTAL DE TABLETS Y PCS POR PLANTA:
+
+SELECT carrito_pcs.planta, SUM(carrito_pcs.numero_pcs) AS Total_PCs, SUM(carrito_tablets.numero_tablets) AS Total_tablets
+FROM carrito_pcs
+JOIN carrito_tablets ON carrito_pcs.planta = carrito_tablets.planta
+GROUP BY carrito_pcs.planta;
+
+
+2. NUMERO TOTAL DE RESERVAS POR PROFESOR:
+
+SELECT profesor.apellidos, profesor.nombre, COUNT(reserva_aula.id_aula) AS Total_reservas
+FROM reserva_aula
+JOIN profesor ON reserva_aula.id_profesor = profesor.id
+GROUP BY profesor.apellidos, profesor.nombre;
+
+
+3. NUMERO TOTAL DE RESERVAS POR FECHA:
+
+SELECT reserva_aula.fecha, COUNT(reserva_aula.id_aula) AS Total_reservas
+FROM reserva_aula
+GROUP BY reserva_aula.fecha;
+
+
+4. AULA QUE MAS VECES HA SIDO RESERVADA:
+
+SELECT aula_informatica.numero_aula, COUNT(reserva_aula.id_aula) AS numero_reservas
+FROM aula_informatica
+JOIN reserva_aula
+ON aula_informatica.id = reserva_aula.id_aula
+GROUP BY aula_informatica.id
+ORDER BY numero_reservas DESC
+LIMIT 1;
+
+
+5. CUANTAS RESERVAS HAY DE UN AULA EN UNA DETERMINADA FECHA:
+
+SELECT COUNT(id_profesor)
+FROM reserva_aula
+WHERE fecha BETWEEN '2023-02-13' AND '2023-02-16';
