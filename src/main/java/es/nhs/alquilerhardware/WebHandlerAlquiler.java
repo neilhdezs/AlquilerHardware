@@ -15,7 +15,7 @@ public class WebHandlerAlquiler {
      * this method is used to show the index.html page
      * @return the index.html page
      */
-    @RequestMapping(value = "/index.html", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String showIndex()
     {
         return "index.html";
@@ -199,26 +199,6 @@ public class WebHandlerAlquiler {
     public String showJsPostDeleteReserva()
     {
         return "/js/post_reservas/postDeleteReserva.js";
-    }
-
-    /**
-     * this method is used to show the login.html page
-     * @return the login.html page
-     */
-    @RequestMapping(value = "/login.html" , method = RequestMethod.GET)
-    public String showLogin()
-    {
-        return "login.html";
-    }
-
-    /**
-     * this method is used to show the forbidden.html page
-     * @return the forbidden.html page
-     */
-    @RequestMapping(value = "/forbidden.html" , method = RequestMethod.GET)
-    public String showForbidden()
-    {
-        return "forbidden.html";
     }
 
 }

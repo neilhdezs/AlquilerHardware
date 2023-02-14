@@ -17,12 +17,13 @@ public class SpringSecurityConfig
     public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception
     {
         //http://acodigo.blogspot.com/2017/05/tutorial-spring-security-basico.html
-        http.
-                authorizeHttpRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
+        http
+                .authorizeRequests()
+                .requestMatchers("/", "", "/js/**", "/css/**").permitAll()
+                .requestMatchers("/aulas/", "/aula/", "/eliminarReserva/").hasRole("USER_CARRITO_1PLANTA")
+                .requestMatchers("/**").hasRole("ADMIN")
+                .and().formLogin()
+                .and().logout();
         return http.build();
     }
 
