@@ -201,4 +201,24 @@ public class WebHandlerAlquiler {
         return "/js/post_reservas/postDeleteReserva.js";
     }
 
+    /**
+     * this method is used to show the login.html page
+     * @return the login.html page
+     */
+    @RequestMapping(value = "/login.html" , method = RequestMethod.GET)
+    public String showLogin()
+    {
+        return "login.html";
+    }
+
+    /**
+     * this method is used to show the forbidden.html page
+     * @return the forbidden.html page
+     */
+    @RequestMapping(value = "/forbidden.html" , method = RequestMethod.GET)
+    public String showForbidden()
+    {
+        return "forbidden.html";
+    }
+
 }
