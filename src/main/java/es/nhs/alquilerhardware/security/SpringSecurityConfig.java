@@ -19,9 +19,7 @@ public class SpringSecurityConfig
         //http://acodigo.blogspot.com/2017/05/tutorial-spring-security-basico.html
         http
                 .authorizeRequests()
-                .requestMatchers("/", "", "/js/**", "/css/**").permitAll()
-                .requestMatchers("/aulas/", "/aula/", "/eliminarReserva/").hasRole("USER_CARRITO_1PLANTA")
-                .requestMatchers("/**").hasRole("ADMIN")
+                .requestMatchers("/","/aula/", "/cancelarAula/",  "/cancelarOrdenadores/", "/cancelarTablets/" , "/confirmar/",  "/pcs/", "/reservas/",  "/reservas/aulas/", "/reservas/pcs/",  "/reservas/tablets/", "/tablets/").hasRole("ADMIN")
                 .and().formLogin()
                 .and().logout();
         return http.build();
