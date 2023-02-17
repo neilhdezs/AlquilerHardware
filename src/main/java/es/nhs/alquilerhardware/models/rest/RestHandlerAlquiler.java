@@ -1,4 +1,4 @@
-package es.nhs.alquilerhardware;
+package es.nhs.alquilerhardware.models.rest;
 
 
 import es.nhs.alquilerhardware.models.*;

@@ -27,3 +27,7 @@ INSERT INTO alquilerhardware.carrito_tablets (id, numero_tablets, planta)
     (2, 10, 1),
     (3, 10, 2),
     (4, 10, 2);
+
+INSERT INTO alquilerhardware.roles VALUES (1,'ADMIN');
+INSERT INTO alquilerhardware.roles VALUES (2,'USER_CARRITO_1PLANTA');
+INSERT INTO alquilerhardware.roles VALUES (3,'USER_CARRITO_2PLANTA');
