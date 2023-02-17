@@ -36,7 +36,7 @@ public class WebHandlerAlquiler
         ModelAndView modelAndView = new ModelAndView();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findUserByUserName(auth.getName());
-        modelAndView.addObject("userName", "Welcome " + user.getName());
+        modelAndView.addObject("userName", "Bienvenido " + user.getName());
         modelAndView.setViewName("index");
         return modelAndView;
     }
@@ -47,9 +47,14 @@ public class WebHandlerAlquiler
      * @return the reservaAula.html page
      */
     @RequestMapping(value = "/aulas/", method = RequestMethod.GET)
-    public String showReservaAulas()
+    public ModelAndView showReservaAulas()
     {
-        return "/reservaAula.html";
+        ModelAndView modelAndView = new ModelAndView();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findUserByUserName(auth.getName());
+        modelAndView.addObject("userName", "Bienvenido " + user.getName());
+        modelAndView.setViewName("reservaAula");
+        return modelAndView;
     }
 
     /**
@@ -58,9 +63,14 @@ public class WebHandlerAlquiler
      * @return the reservaTablets.html page
      */
     @RequestMapping(value = "/tablets/", method = RequestMethod.GET)
-    public String showReservaTablets()
+    public ModelAndView showReservaTablets()
     {
-        return "/reservaTablets.html";
+        ModelAndView modelAndView = new ModelAndView();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findUserByUserName(auth.getName());
+        modelAndView.addObject("userName", "Bienvenido " + user.getName());
+        modelAndView.setViewName("reservaTablets");
+        return modelAndView;
     }
 
     /**
@@ -69,9 +79,14 @@ public class WebHandlerAlquiler
      * @return the reservaPcs.html page
      */
     @RequestMapping(value = "/pcs/", method = RequestMethod.GET)
-    public String showReservaPcs()
+    public ModelAndView showReservaPcs()
     {
-        return "/reservaPcs.html";
+        ModelAndView modelAndView = new ModelAndView();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findUserByUserName(auth.getName());
+        modelAndView.addObject("userName", "Bienvenido " + user.getName());
+        modelAndView.setViewName("reservaPcs");
+        return modelAndView;
     }
 
     /**
@@ -80,9 +95,14 @@ public class WebHandlerAlquiler
      * @return the removeReserva.html page
      */
     @RequestMapping(value = "/eliminarReserva/", method = RequestMethod.GET)
-    public String showEliminarReserva()
+    public ModelAndView showEliminarReserva()
     {
-        return "/removeReserva.html";
+        ModelAndView modelAndView = new ModelAndView();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findUserByUserName(auth.getName());
+        modelAndView.addObject("userName", "Bienvenido " + user.getName());
+        modelAndView.setViewName("removeReserva");
+        return modelAndView;
     }
 
     /**

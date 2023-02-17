@@ -8,9 +8,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -41,6 +39,7 @@ public class WebSecurityConfiguration
         http
                 .csrf().disable()
                 .authorizeHttpRequests()
+                .requestMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .requestMatchers("/login").permitAll()
                 .requestMatchers("/register").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/","/aulas/", "/aula/", "/cancelarAula/",  "/cancelarOrdenadores/", "/cancelarTablets/" , "/confirmar/",  "/pcs/", "/reservas/",  "/reservas/aulas/", "/reservas/pcs/",  "/reservas/tablets/", "/tablets/", "/eliminarReserva/").hasAnyAuthority("ADMIN", "USER_CARRITO_1PLANTA", "USER_CARRITO_2PLANTA")
@@ -55,14 +54,6 @@ public class WebSecurityConfiguration
         return http.build();
     }
 
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web
-                .ignoring()
-                .requestMatchers("/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
-
-    }
 
 
 }

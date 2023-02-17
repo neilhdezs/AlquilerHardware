@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-  <title>Spring Security Tutorial</title>
+  <title>Login Alquiler Hardware</title>
   <link rel="stylesheet" type="text/css" th:href="@{/css/tables.css}"/>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
@@ -11,26 +11,36 @@
 </head>
 
 <body>
-<form th:action="@{/register}" method="get">
-  <button class="btn btn-md btn-warning btn-block" type="Submit">Go To Registration Page</button>
-</form>
+<br>
+<br>
+<br>
+<br>
+
 
 <div class="container">
-  <form th:action="@{/login}" method="POST" class="form-signin">
-    <h3>Bienvenido a Reservas</h3>
-    <br/>
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <form th:action="@{/login}" method="POST" class="form-signin">
+        <h3>Bienvenido a Reservas</h3>
+        <br/>
 
-    <input type="text" id="user_name" name="user_name" placeholder="User Name"
-           class="form-control"/> <br/>
-    <input type="password" th:placeholder="Password"
-           id="password" name="password" class="form-control"/> <br/>
+        <input type="text" id="user_name" name="user_name" placeholder="User Name"
+               class="form-control"/> <br/>
+        <input type="password" th:placeholder="Password"
+               id="password" name="password" class="form-control"/> <br/>
 
-    <div align="center" th:if="${param.error}">
-      <p style="font-size:20px ; color: #FF1C19;">User Name or Password invalid, please verify</p>
+        <div align="center" th:if="${param.error}">
+          <p style="font-size:20px ; color: #FF1C19;">User Name or Password invalid, please verify</p>
+        </div>
+        <button class="btn btn-block" style="background-color: #186A3B; color: white;" name="Submit" value="Login" type="Submit"
+                th:text="Entrar"></button>
+      </form>
+      <br>
+      <form th:action="@{/register}" method="get" class="form-signin">
+        <button class="btn btn-md btn-block" style="background-color: #212529; color: white;" type="Submit">Registrarse</button>
+      </form>
     </div>
-    <button class="btn btn-lg btn-primary btn-block" name="Submit" value="Login" type="Submit"
-            th:text="Login"></button>
-  </form>
+  </div>
 </div>
 </body>
 </html>

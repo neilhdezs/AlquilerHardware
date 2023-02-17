@@ -32,8 +32,9 @@
           </li>
         </ul>
         <input type="button" value="Confirmar" name="confirmarReserva" id="submitConfirmacion"/>
-        <a class="nav-link" th:href="@{/logout}"><button type="button" class="btn btn-secondary btn-sm">Log Out</button></a>
       </div>
+      <span style="margin-left: auto; margin-right: 20px" th:utext="${userName}"></span>
+      <a style="margin-left: auto;" th:href="@{/logout}"><button type="button" class="btn btn-secondary btn-sm">Log Out</button></a>
     </nav>
 
 
